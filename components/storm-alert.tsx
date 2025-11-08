@@ -79,7 +79,7 @@ interface StormAlertProps {
 
 export function StormAlert({ className }: StormAlertProps) {
   const { user, isLoaded } = useUser();
-  const [isfetching, setIsfetching] = useState<boolean>(false);
+  const [hasFetched, setHasFetched] = useState<boolean>(false);
   const [typhoons, setTyphoons] = useState<Typhoon[]>([]);
   const [dismissedAlerts, setDismissedAlerts] = useState<Set<string>>(new Set());
   const [nearbyStorms, setNearbyStorms] = useState<
@@ -118,7 +118,7 @@ export function StormAlert({ className }: StormAlertProps) {
 
   // Calculate nearby storms when user location or typhoons change
   useEffect(() => {
-    if (isfetching||!isLoaded || !user || !userLocation || typhoons.length === 0) {
+    if ((hasFetched||!isLoaded || !user || !userLocation || typhoons.length === 0) ) {
       console.log("[StormAlert] Skipping calculation - missing requirements");
       setNearbyStorms([]);
       return;
@@ -127,7 +127,6 @@ export function StormAlert({ className }: StormAlertProps) {
     // Async function to calculate storms with location info
     const calculateStorms = async () => {
       const storms: typeof nearbyStorms = [];
-      setIsfetching(true);
       // Get location info once for all storms
       let locationInfo: Awaited<ReturnType<typeof getLocationFromCoordinates>>;
       try {
@@ -135,7 +134,8 @@ export function StormAlert({ className }: StormAlertProps) {
           userLocation.latitude,
           userLocation.longitude
         );
-        console.log("[StormAlert] Location info:", locationInfo);
+        
+        setHasFetched(true)
       } catch (error) {
         console.error("[StormAlert] Error getting location:", error);
         // Use fallback location
@@ -248,32 +248,16 @@ export function StormAlert({ className }: StormAlertProps) {
       storms.sort((a, b) => a.distance - b.distance);
       console.log(`[StormAlert] Found ${storms.length} nearby storm(s)`);
       setNearbyStorms(storms);
-      setIsfetching(false);
     };
 
     calculateStorms();
-  }, [user, isLoaded, userLocation, typhoons, isfetching]);
+  }, [user, isLoaded, userLocation, typhoons]);
 
-  // Don't show anything if user is not signed in
-  if (!isLoaded || !user) {
-    console.log("[StormAlert] User not signed in or not loaded");
-    return null;
-  }
-
-  // Don't show anything if user has no location
-  if (!userLocation) {
-    console.log("[StormAlert] User has no location saved");
-    return null;
-  }
 
   // Filter out dismissed alerts
   const activeAlerts = nearbyStorms.filter(
     (storm) => !dismissedAlerts.has(storm.typhoon.id)
   );
-
-  if (activeAlerts.length === 0) {
-    return null;
-  }
 
   const handleDismiss = (typhoonId: string) => {
     setDismissedAlerts((prev) => new Set(prev).add(typhoonId));
