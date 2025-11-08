@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { AlertSystem } from "@/components/alert-system";
 import { EarthquakeList } from "@/components/earthquake-list";
 import { EarthquakeStats } from "@/components/earthquake-stats";
+import { LocationPicker } from "@/components/location-picker";
 import { AlertTriangle, Play, Trash2 } from "lucide-react";
 import { Earthquake } from "@/app/actions/earthquake";
 
@@ -20,6 +21,7 @@ export default function SimulatePage() {
   const [depth, setDepth] = useState("10");
   const [location, setLocation] = useState("Manila, Philippines");
   const [isSimulating, setIsSimulating] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
 
   const saveEarthquake = useMutation(api.earthquakes.saveTestEarthquake);
   const testEarthquakes = useQuery(api.earthquakes.getTestEarthquakes) || [];
@@ -119,6 +121,162 @@ export default function SimulatePage() {
     }
   };
 
+  // Calculate distance between two points in km
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Earth's radius in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  // Calculate bearing from point 1 to point 2 in degrees
+  const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const lat1Rad = (lat1 * Math.PI) / 180;
+    const lat2Rad = (lat2 * Math.PI) / 180;
+    const y = Math.sin(dLon) * Math.cos(lat2Rad);
+    const x =
+      Math.cos(lat1Rad) * Math.sin(lat2Rad) -
+      Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
+    let bearing = (Math.atan2(y, x) * 180) / Math.PI;
+    bearing = (bearing + 360) % 360;
+    return bearing;
+  };
+
+  // Format location in PHIVOLCS style: "013 km N 87° E of Baganga (Davao Oriental)"
+  const formatPHIVOLCSLocation = (
+    distance: number,
+    bearing: number,
+    locationName: string,
+    province: string
+  ): string => {
+    const distKm = Math.round(distance);
+    const distStr = distKm.toString().padStart(3, "0");
+    
+    // Convert bearing to PHIVOLCS format (N/S angle E/W)
+    // Bearing: 0° = North, 90° = East, 180° = South, 270° = West
+    let northSouth: string;
+    let eastWest: string;
+    let angle: number;
+    
+    if (bearing <= 90) {
+      // Northeast quadrant
+      northSouth = "N";
+      eastWest = "E";
+      angle = bearing;
+    } else if (bearing <= 180) {
+      // Southeast quadrant
+      northSouth = "S";
+      eastWest = "E";
+      angle = 180 - bearing;
+    } else if (bearing <= 270) {
+      // Southwest quadrant
+      northSouth = "S";
+      eastWest = "W";
+      angle = bearing - 180;
+    } else {
+      // Northwest quadrant
+      northSouth = "N";
+      eastWest = "W";
+      angle = 360 - bearing;
+    }
+    
+    const angleStr = Math.round(angle).toString().padStart(2, "0");
+    
+    return `${distStr} km ${northSouth} ${angleStr}° ${eastWest} of ${locationName} (${province})`;
+  };
+
+  const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`,
+        {
+          headers: {
+            "User-Agent": "Earthquake Alert System",
+          },
+        }
+      );
+      const data = await response.json();
+      
+      if (data.address) {
+        const addr = data.address;
+        
+        // Get location name (city, town, municipality, or village)
+        const locationName =
+          addr.city || addr.town || addr.municipality || addr.village || addr.suburb || "Location";
+        
+        // Get province
+        const province = addr.state || addr.province || "Philippines";
+        
+        // Get coordinates of the location (for calculating distance/bearing)
+        // Use the center of the location if available, otherwise use the clicked point
+        let refLat = lat;
+        let refLon = lng;
+        
+        // Try to get a nearby reference point by searching for the location
+        try {
+          const searchResponse = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+              locationName + ", " + province
+            )}&limit=1`,
+            {
+              headers: {
+                "User-Agent": "Earthquake Alert System",
+              },
+            }
+          );
+          const searchData = await searchResponse.json();
+          
+          if (searchData.length > 0) {
+            refLat = parseFloat(searchData[0].lat);
+            refLon = parseFloat(searchData[0].lon);
+          }
+        } catch (searchError) {
+          console.error("Error searching for reference location:", searchError);
+        }
+        
+        // Calculate distance and bearing from reference point to clicked point
+        const distance = calculateDistance(refLat, refLon, lat, lng);
+        const bearing = calculateBearing(refLat, refLon, lat, lng);
+        
+        // If distance is very small (< 1km), just return the location name
+        if (distance < 1) {
+          return `${locationName} (${province})`;
+        }
+        
+        // Format in PHIVOLCS style
+        return formatPHIVOLCSLocation(distance, bearing, locationName, province);
+      }
+      
+      // Fallback to coordinates if reverse geocoding fails
+      return `Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+    } catch (error) {
+      console.error("Error reverse geocoding:", error);
+      return `Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+    }
+  };
+
+  const handleLocationChange = async (lat: number, lng: number) => {
+    setLatitude(lat.toFixed(4));
+    setLongitude(lng.toFixed(4));
+    
+    // Get location name from coordinates
+    setIsGeocoding(true);
+    try {
+      const locationName = await reverseGeocode(lat, lng);
+      setLocation(locationName);
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
@@ -163,9 +321,28 @@ export default function SimulatePage() {
               <Input
                 id="location"
                 type="text"
-                value={location}
+                value={isGeocoding ? "Loading location..." : location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Manila, Philippines"
+                disabled={isGeocoding}
+              />
+              {isGeocoding && (
+                <p className="text-xs text-muted-foreground">
+                  Getting location name from coordinates...
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Select Location on Map</Label>
+              <p className="text-xs text-muted-foreground">
+                Click on the map to set the earthquake location
+              </p>
+              <LocationPicker
+                latitude={parseFloat(latitude) || 14.5995}
+                longitude={parseFloat(longitude) || 120.9842}
+                onLocationChange={handleLocationChange}
+                height="300px"
               />
             </div>
 
@@ -180,6 +357,9 @@ export default function SimulatePage() {
                   onChange={(e) => setLatitude(e.target.value)}
                   placeholder="14.5995"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Auto-filled from map
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -192,6 +372,9 @@ export default function SimulatePage() {
                   onChange={(e) => setLongitude(e.target.value)}
                   placeholder="120.9842"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Auto-filled from map
+                </p>
               </div>
             </div>
 

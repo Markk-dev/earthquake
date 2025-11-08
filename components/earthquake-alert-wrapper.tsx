@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertSystem } from "./alert-system";
+import { NewEarthquakeAlert } from "./new-earthquake-alert";
 import { Earthquake } from "@/app/actions/earthquake";
 
 interface EarthquakeAlertWrapperProps {
@@ -12,7 +12,7 @@ export function EarthquakeAlertWrapper({
 }: EarthquakeAlertWrapperProps) {
   return (
     <div className="mb-6">
-      <AlertSystem earthquakes={earthquakes} minMagnitude={5.0} />
+      <NewEarthquakeAlert earthquakes={earthquakes} />
     </div>
   );
 }

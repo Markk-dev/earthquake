@@ -162,18 +162,30 @@ export function PaginatedEarthquakeList({
             {currentEarthquakes.map((earthquake) => (
               <TableRow key={earthquake.id}>
                 <TableCell>
-                  <Badge
-                    className={getMagnitudeColor(earthquake.magnitude)}
-                    variant={earthquake.magnitude >= 7.0 ? "destructive" : "default"}
-                  >
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    {earthquake.magnitude.toFixed(1)}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      className={getMagnitudeColor(earthquake.magnitude)}
+                      variant={earthquake.magnitude >= 7.0 ? "destructive" : "default"}
+                    >
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                      {earthquake.magnitude.toFixed(1)}
+                    </Badge>
+                    {earthquake.isTest && (
+                      <Badge variant="outline" className="border-orange-500 text-orange-600">
+                        TEST
+                      </Badge>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{earthquake.place}</span>
+                    <span className="font-medium">
+                      {earthquake.place}
+                      {earthquake.isTest && (
+                        <span className="text-orange-600 ml-1 text-xs">(Test)</span>
+                      )}
+                    </span>
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
                     {earthquake.coordinates.latitude.toFixed(4)}°N,{" "}

@@ -3,6 +3,8 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 import https from "https";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "@/convex/_generated/api";
 
 export interface Earthquake {
   id: string;
@@ -32,6 +34,7 @@ export interface Earthquake {
     latitude: number;
     depth: number;
   };
+  isTest?: boolean; // Optional flag to indicate test earthquakes
 }
 
 interface PHIVOLCSEarthquake {
@@ -294,7 +297,8 @@ function transformPHIVOLCSData(
   });
 }
 
-export async function getEarthquakes(): Promise<Earthquake[]> {
+// Get only real earthquakes from PHIVOLCS (without test earthquakes)
+export async function getRealEarthquakes(): Promise<Earthquake[]> {
   try {
     const phivolcsData = await fetchPHIVOLCSEarthquakeData();
     const earthquakes = transformPHIVOLCSData(phivolcsData);
@@ -308,7 +312,77 @@ export async function getEarthquakes(): Promise<Earthquake[]> {
     );
 
     // Sort by most recent first
-    const sorted = last24Hours.sort((a, b) => b.time - a.time);
+    return last24Hours.sort((a, b) => b.time - a.time);
+  } catch (error) {
+    console.error("Error fetching real earthquakes:", error);
+    return [];
+  }
+}
+
+export async function getEarthquakes(): Promise<Earthquake[]> {
+  try {
+    const phivolcsData = await fetchPHIVOLCSEarthquakeData();
+    const earthquakes = transformPHIVOLCSData(phivolcsData);
+
+    // Filter to last 24 hours
+    const now = Date.now();
+    const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
+
+    const last24Hours = earthquakes.filter(
+      (eq) => eq.time >= twentyFourHoursAgo
+    );
+
+    // Fetch test earthquakes from Convex
+    let testEarthquakes: Earthquake[] = [];
+    try {
+      const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+      if (convexUrl) {
+        const client = new ConvexHttpClient(convexUrl);
+        const testData = await client.query(api.earthquakes.getTestEarthquakes, {});
+        
+        // Transform Convex data to Earthquake format
+        testEarthquakes = testData.map((eq: any) => ({
+          id: eq.id,
+          magnitude: eq.magnitude,
+          place: eq.place,
+          time: eq.time,
+          updated: eq.updated,
+          url: eq.url,
+          detail: eq.detail,
+          status: eq.status,
+          tsunami: eq.tsunami,
+          sig: eq.sig,
+          net: eq.net,
+          code: eq.code,
+          ids: eq.ids,
+          sources: eq.sources,
+          types: eq.types,
+          nst: eq.nst,
+          dmin: eq.dmin,
+          rms: eq.rms,
+          gap: eq.gap,
+          magType: eq.magType,
+          type: eq.type,
+          title: eq.title,
+          coordinates: eq.coordinates,
+          isTest: true, // Mark as test earthquake
+        }));
+
+        // Filter test earthquakes to last 24 hours
+        testEarthquakes = testEarthquakes.filter(
+          (eq) => eq.time >= twentyFourHoursAgo
+        );
+      }
+    } catch (convexError) {
+      console.error("Error fetching test earthquakes:", convexError);
+      // Continue without test earthquakes if Convex fails
+    }
+
+    // Merge real and test earthquakes
+    const allEarthquakes = [...last24Hours, ...testEarthquakes];
+
+    // Sort by most recent first
+    const sorted = allEarthquakes.sort((a, b) => b.time - a.time);
 
     return sorted;
   } catch (error) {

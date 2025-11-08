@@ -73,6 +73,25 @@ export const getTestEarthquakes = query({
   },
 });
 
+// Get all earthquakes (test + real) from last 24 hours
+export const getAllEarthquakes = query({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
+    
+    // Get all earthquakes (both test and real)
+    const all = await ctx.db
+      .query("earthquakes")
+      .collect();
+    
+    // Filter to last 24 hours and sort by time descending
+    return all
+      .filter((eq) => eq.time >= twentyFourHoursAgo)
+      .sort((a, b) => b.time - a.time);
+  },
+});
+
 // Get test earthquakes by magnitude threshold
 export const getTestEarthquakesByMagnitude = query({
   args: {
