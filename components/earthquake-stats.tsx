@@ -1,6 +1,7 @@
 import { Earthquake } from "@/app/actions/earthquake";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, AlertTriangle, TrendingUp, MapPin } from "lucide-react";
+import { DottedSeparator } from "./ui/dottedLine";
 
 interface EarthquakeStatsProps {
   earthquakes: Earthquake[];
@@ -22,6 +23,7 @@ export function EarthquakeStats({ earthquakes }: EarthquakeStatsProps) {
       description: "Last 24 hours",
       icon: Activity,
       color: "text-blue-600",
+      classValue: "text-blue-600 text-3xl font-bold"
     },
     {
       title: "Significant (≥5.0)",
@@ -29,6 +31,7 @@ export function EarthquakeStats({ earthquakes }: EarthquakeStatsProps) {
       description: "Magnitude 5.0+",
       icon: AlertTriangle,
       color: "text-orange-600",
+      classValue: "text-orange-600 text-3xl font-bold"
     },
     {
       title: "Major (≥7.0)",
@@ -36,6 +39,7 @@ export function EarthquakeStats({ earthquakes }: EarthquakeStatsProps) {
       description: "Magnitude 7.0+",
       icon: TrendingUp,
       color: "text-red-600",
+      classValue: "text-red-600 text-3xl font-bold"
     },
     {
       title: "Avg Magnitude",
@@ -43,6 +47,7 @@ export function EarthquakeStats({ earthquakes }: EarthquakeStatsProps) {
       description: "Average of all events",
       icon: MapPin,
       color: "text-purple-600",
+      classValue: "text-purple-600 text-3xl font-bold"
     },
   ];
 
@@ -56,10 +61,11 @@ export function EarthquakeStats({ earthquakes }: EarthquakeStatsProps) {
               <CardTitle className="text-sm font-medium">
                 {stat.title}
               </CardTitle>
-              <Icon className={`h-4 w-4 ${stat.color}`} />
+              <Icon className={`h-4 w-4 ${stat.color }`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className={`text-2xl font-bold ${stat.classValue}`}>{stat.value}</div>
+              <DottedSeparator className="my-2"/>
               <p className="text-xs text-muted-foreground">
                 {stat.description}
               </p>
