@@ -66,3 +66,28 @@ export const getUserByClerkId = query({
   },
 });
 
+/**
+ * Get current user's location (for signed-in users)
+ * Returns null if user not found or has no location
+ */
+export const getCurrentUserLocation = query({
+  args: {
+    clerkId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+
+    if (!user || !user.location) {
+      return null;
+    }
+
+    return {
+      latitude: user.location.latitude,
+      longitude: user.location.longitude,
+    };
+  },
+});
+
