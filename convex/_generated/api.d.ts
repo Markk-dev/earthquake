@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as earthquakes from "../earthquakes.js";
 import type * as tasks from "../tasks.js";
 
 import type {
@@ -25,6 +26,7 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  earthquakes: typeof earthquakes;
   tasks: typeof tasks;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

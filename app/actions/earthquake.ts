@@ -299,8 +299,16 @@ export async function getEarthquakes(): Promise<Earthquake[]> {
     const phivolcsData = await fetchPHIVOLCSEarthquakeData();
     const earthquakes = transformPHIVOLCSData(phivolcsData);
 
+    // Filter to last 24 hours
+    const now = Date.now();
+    const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
+
+    const last24Hours = earthquakes.filter(
+      (eq) => eq.time >= twentyFourHoursAgo
+    );
+
     // Sort by most recent first
-    const sorted = earthquakes.sort((a, b) => b.time - a.time);
+    const sorted = last24Hours.sort((a, b) => b.time - a.time);
 
     return sorted;
   } catch (error) {

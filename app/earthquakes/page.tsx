@@ -1,6 +1,7 @@
 import { getEarthquakes } from "@/app/actions/earthquake";
-import { EarthquakeList } from "@/components/earthquake-list";
+import { PaginatedEarthquakeList } from "@/components/paginated-earthquake-list";
 import { EarthquakeStats } from "@/components/earthquake-stats";
+import { EarthquakeAlertWrapper } from "@/components/earthquake-alert-wrapper";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -48,8 +49,9 @@ async function EarthquakeContent() {
 
   return (
     <div className="space-y-6">
+      <EarthquakeAlertWrapper earthquakes={earthquakes} />
       <EarthquakeStats earthquakes={earthquakes} />
-      <EarthquakeList earthquakes={earthquakes} />
+      <PaginatedEarthquakeList earthquakes={earthquakes} itemsPerPage={8} />
     </div>
   );
 }
@@ -62,7 +64,7 @@ export default function EarthquakesPage() {
           Real-Time Earthquake Monitoring
         </h1>
         <p className="text-muted-foreground">
-          Live earthquake data for the Philippines region. Data updates every 60 seconds.
+          Live earthquake data for the Philippines region from the last 24 hours. Data updates every 60 seconds.
         </p>
       </div>
       <Suspense fallback={<LoadingSkeleton />}>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, AlertTriangle, MapPin, TrendingUp } from "lucide-react";
+import { Activity, AlertTriangle, MapPin, TrendingUp, TestTube } from "lucide-react";
 
 export default function Home() {
   return (
@@ -22,7 +22,7 @@ export default function Home() {
               <Activity className="h-8 w-8 text-blue-600 mb-2" />
               <CardTitle>Real-Time Data</CardTitle>
               <CardDescription>
-                Live earthquake data updated every 60 seconds from USGS
+                Live earthquake data updated every 60 seconds from PHIVOLCS
               </CardDescription>
             </CardHeader>
           </Card>
@@ -48,11 +48,17 @@ export default function Home() {
           </Card>
         </div>
 
-        <div className="flex justify-center gap-4 pt-8">
+        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-8">
           <Button asChild size="lg" className="text-lg px-8">
             <Link href="/earthquakes">
               <TrendingUp className="mr-2 h-5 w-5" />
               View Live Earthquakes
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="outline" className="text-lg px-8">
+            <Link href="/simulate">
+              <TestTube className="mr-2 h-5 w-5" />
+              Test Alert System
             </Link>
           </Button>
         </div>
