@@ -512,6 +512,13 @@ export async function getActiveFloods(): Promise<Flood[]> {
     });
     return [];
   }
+    },
+    ["floods"],
+    {
+      revalidate: 900, // 15 minutes
+      tags: ["floods"],
+    }
+  )();
 }
 
 /**
