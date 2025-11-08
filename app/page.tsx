@@ -54,16 +54,18 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <div className="relative h-full w-full">
-            <Image
-              src="/bg.jpg"
-              alt="Background"
-              fill
-              className="object-cover opacity-20 dark:opacity-10"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
+        <div className="absolute inset-0 bg-black z-0">
+          <div className="absolute top-0 right-0 w-full md:w-2/3 h-full animate-fade-in">
+            <div className="relative h-full w-full">
+              <Image
+                src="/bg.jpg"
+                alt="Background"
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent" />
+            </div>
           </div>
         </div>
 
@@ -74,7 +76,7 @@ export default function Home() {
               <AlertTriangle className="h-7 w-7 text-primary-foreground" />
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-3 bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent">
+            <h1 className="text-4xl text-white sm:text-5xl md:text-6xl font-bold mb-3 bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text ">
               Philcast
             </h1>
             

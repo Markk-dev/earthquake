@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
     keepAlive: true,
     maxSockets: 10,
   }),
-  timeout: 10000, // Reduced from 30s to 10s for faster failures
+  timeout: 10000,
   headers: {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -18,15 +18,15 @@ const axiosInstance = axios.create({
   },
 });
 
-// Simple in-memory cache with TTL
+// in-memory cache with TTL
 interface CacheEntry<T> {
   data: T;
   timestamp: number;
-  ttl: number; // Time to live in milliseconds
+  ttl: number; 
 }
 
 const cache = new Map<string, CacheEntry<unknown>>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
+const CACHE_TTL = 5 * 60 * 1000; 
 
 function getCached<T>(key: string): T | null {
   const entry = cache.get(key);
@@ -38,7 +38,7 @@ function getCached<T>(key: string): T | null {
     return null;
   }
   
-  // Type assertion is safe here because we control what goes into the cache
+
   return entry.data as T;
 }
 
@@ -61,23 +61,21 @@ export interface Flood {
   };
   severity: "low" | "moderate" | "high" | "extreme";
   waterLevel: {
-    current: number; // in meters
-    normal: number; // in meters
+    current: number; 
+    normal: number;
     status: "normal" | "monitoring" | "alert" | "alarm";
   };
   affectedAreas: string[];
   status: "active" | "monitoring" | "resolved";
-  reportedAt: number; // timestamp
-  updatedAt: number; // timestamp
+  reportedAt: number; 
+  updatedAt: number;
   source: string;
   description?: string;
   evacuationCenters?: number;
   affectedPopulation?: number;
 }
 
-/**
- * Fetch flood data for a single basin from Open-Meteo
- */
+//Fetch na parralel kasi fuck mabagal apg isa isa
 async function fetchBasinData(basin: {
   name: string;
   lat: number;
@@ -170,9 +168,7 @@ async function fetchBasinData(basin: {
   }
 }
 
-/**
- * Fetch flood data from Open-Meteo Flood API (optimized with parallel requests)
- */
+
 async function fetchOpenMeteoFloodData(): Promise<Flood[]> {
   try {
     console.log("[Open-Meteo] Starting flood data fetch...");
@@ -211,9 +207,7 @@ async function fetchOpenMeteoFloodData(): Promise<Flood[]> {
   }
 }
 
-/**
- * Fetch and parse flood data from a single PAGASA URL
- */
+
 async function fetchPAGASAUrl(url: string): Promise<Flood[]> {
   const cacheKey = `pagasa-${url}`;
   const cached = getCached<Flood[]>(cacheKey);
@@ -303,24 +297,20 @@ async function fetchPAGASAUrl(url: string): Promise<Flood[]> {
         }
       });
 
-      // If we found floods with this selector, we can stop
+
       if (floods.length > 0) {
         break;
       }
     }
 
-    // Cache results (even if empty, to avoid re-fetching)
     setCache(cacheKey, floods, CACHE_TTL);
     return floods;
   } catch {
-    // Return empty array on error
     return [];
   }
 }
 
-/**
- * Fetch flood data from PAGASA by scraping (optimized with parallel requests)
- */
+
 async function fetchPAGASAFloodData(): Promise<Flood[]> {
   try {
     console.log("[PAGASA] Starting flood data fetch...");
@@ -331,19 +321,18 @@ async function fetchPAGASAFloodData(): Promise<Flood[]> {
       "https://www.pagasa.dost.gov.ph/weather/flood",
     ];
 
-    // Fetch all URLs in parallel
+    // Fetch all URLs in parallel basically fuckt shit
     const results = await Promise.allSettled(
       urls.map(url => fetchPAGASAUrl(url))
     );
 
-    // Collect all floods from successful requests
+
     const allFloods: Flood[] = [];
     const seenLocations = new Set<string>();
 
     for (const result of results) {
       if (result.status === "fulfilled") {
         for (const flood of result.value) {
-          // Deduplicate by location name
           const locationKey = flood.location.name.toLowerCase();
           if (!seenLocations.has(locationKey)) {
             seenLocations.add(locationKey);
@@ -362,9 +351,7 @@ async function fetchPAGASAFloodData(): Promise<Flood[]> {
   }
 }
 
-/**
- * Get coordinates for known Philippine locations
- */
+// Coords ng mga resovoir puta
 function getLocationCoordinates(locationName: string): { name: string; province: string; region: string; latitude: number; longitude: number } | null {
   const locations: Record<string, { name: string; province: string; region: string; latitude: number; longitude: number }> = {
     manila: { name: "Manila", province: "Metro Manila", region: "NCR", latitude: 14.5995, longitude: 120.9842 },
@@ -387,17 +374,11 @@ function getLocationCoordinates(locationName: string): { name: string; province:
   return locations[key] || null;
 }
 
-/**
- * Fetch flood data from alternative sources (NDRRMC, news sources, etc.)
- */
+
 async function fetchAlternativeFloodData(): Promise<Flood[]> {
   try {
     const floods: Flood[] = [];
-    
-    // Try to fetch from NDRRMC or other government sources
-    // This is a placeholder - implement when API becomes available
-    // For now, we can try scraping news sources or social media
-    
+  
     return floods;
   } catch (error) {
     console.log("Error fetching alternative flood data:", error);
@@ -405,21 +386,10 @@ async function fetchAlternativeFloodData(): Promise<Flood[]> {
   }
 }
 
-/**
- * Get active floods in the Philippines
- * This function aggregates data from multiple sources (optimized with parallel fetching)
- */
-// Cached for 15 minutes
+
 export async function getActiveFloods(): Promise<Flood[]> {
-  const { unstable_cache } = await import("next/cache");
-  
-  return unstable_cache(
-    async () => {
   try {
-    console.log("========================================");
-    console.log("[FLOOD] Starting getActiveFloods()");
-    console.log("========================================");
-    
+
     // Check cache first
     const cacheKey = "active-floods-all";
     const cached = getCached<Flood[]>(cacheKey);
@@ -514,9 +484,6 @@ export async function getActiveFloods(): Promise<Flood[]> {
   }
 }
 
-/**
- * Get severity level as number for sorting
- */
 function getSeverityLevel(severity: Flood["severity"]): number {
   const levels: Record<Flood["severity"], number> = {
     low: 1,

@@ -113,8 +113,7 @@ export function FloodDisplay() {
     fetchFloods();
 
     // Fetch every 15 minutes
-    // Cache is 15 minutes, so only refresh every 20 minutes to avoid unnecessary calls
-    const interval = setInterval(fetchFloods, 20 * 60 * 1000);
+    const interval = setInterval(fetchFloods, 15 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -211,10 +210,8 @@ export function FloodDisplay() {
             {isLoading && " Fetching latest flood data..."}
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-2 sm:p-6">
-          <div className="w-full h-[400px] sm:h-[500px] lg:h-[600px]">
-            <FloodMap floods={floods} height="100%" />
-          </div>
+        <CardContent>
+          <FloodMap floods={floods} height="600px" isLoading={isLoading} />
           {error && (
             <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
               <div className="flex items-center gap-2 text-destructive">
