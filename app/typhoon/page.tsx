@@ -23,7 +23,7 @@ export default function TyphoonPage() {
           Data is updated every 15 minutes from authoritative sources.
         </p>
       </div>
-      <WindyMap className={""}/>
+      <WindyMap />
     <DailyForecast />
     </div>
   );

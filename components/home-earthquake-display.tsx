@@ -147,10 +147,8 @@ export function HomeEarthquakeDisplay() {
     if (newEarthquakes.length > 0) {
       const mostRecentNew = newEarthquakes[0]; // Already sorted by time
       
-      // Dismiss any existing toast to ensure only one is displayed at a time
-      if (currentToastIdRef.current !== null) {
-        toast.dismiss(currentToastIdRef.current);
-      }
+      // Dismiss ALL existing toasts to ensure only one is displayed at a time
+      toast.dismiss();
       
       // Format coordinates
       const coordinates = `${mostRecentNew.coordinates.latitude.toFixed(4)}°N, ${mostRecentNew.coordinates.longitude.toFixed(4)}°E`;

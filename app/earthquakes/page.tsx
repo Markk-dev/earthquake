@@ -1,7 +1,6 @@
 import { RealtimeEarthquakes } from "@/components/realtime-earthquakes";
 import type { Metadata } from "next";
 import { HomeEarthquakeDisplay } from "@/components/home-earthquake-display";
-import { DottedSeparator } from "@/components/ui/dottedLine";
 
 export const metadata: Metadata = {
   title: "Live Earthquakes - Philippines | Earthquake Monitoring System",
@@ -13,8 +12,8 @@ export const dynamic = "force-dynamic";
 
 export default function EarthquakesPage() {
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div>
+    <div className="container mx-auto my-8 py-4 px-4">
+      <div className="mb-10">
         <h1 className="text-4xl font-bold tracking-tight mb-2">
           Real-Time Earthquake Monitoring
         </h1>
@@ -22,7 +21,6 @@ export default function EarthquakesPage() {
           Live earthquake data for the Philippines region from the last 24 hours. Updates in real-time.
         </p>
       </div>
-      <DottedSeparator className="my-4"/>
       <HomeEarthquakeDisplay/>
       <RealtimeEarthquakes />
     </div>
