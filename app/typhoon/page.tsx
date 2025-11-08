@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wind, ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
+import { DailyForecast } from "@/components/daily-forecast";
 
 export const metadata: Metadata = {
   title: "Typhoon Monitoring - Philippines | Disaster Monitoring System",
@@ -27,26 +28,7 @@ export default function TyphoonPage() {
         </p>
       </div>
 
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader className="text-center">
-          <Wind className="h-20 w-20 text-blue-600 mx-auto mb-4" />
-          <CardTitle className="text-3xl">Coming Soon</CardTitle>
-          <CardDescription className="text-lg">
-            Typhoon monitoring and tracking features are currently under development.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-center space-y-4">
-          <p className="text-muted-foreground">
-            This feature will provide real-time typhoon tracking, alerts, and monitoring 
-            for the Philippines region.
-          </p>
-          <Button asChild>
-            <Link href="/">
-              Return to Home
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
+    <DailyForecast />
     </div>
   );
 }
