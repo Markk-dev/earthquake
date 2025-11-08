@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, MapPin, Clock, TrendingUp } from "lucide-react";
+import { DottedSeparator } from "./ui/dottedLine";
 
 function getMagnitudeColor(magnitude: number): string {
   if (magnitude >= 7.0) return "destructive";
@@ -52,7 +53,7 @@ export function EarthquakeList({ earthquakes }: EarthquakeListProps) {
           <CardTitle>No Recent Earthquakes</CardTitle>
           <CardDescription>
             No earthquakes detected in the Philippines region in the last 24 hours.
-          </CardDescription>
+          </CardDescription>  
         </CardHeader>
       </Card>
     );
@@ -72,6 +73,7 @@ export function EarthquakeList({ earthquakes }: EarthquakeListProps) {
             </CardDescription>
           </div>
         </div>
+      <DottedSeparator/>
       </CardHeader>
       <CardContent>
         <Table>
