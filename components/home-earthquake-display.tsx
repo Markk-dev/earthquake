@@ -177,11 +177,12 @@ export function HomeEarthquakeDisplay() {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-3">
+          <CardContent>
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Left Div - Earthquake Details */}
+              <div className="flex-1 space-y-4">
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">Location</span>
                   </div>
@@ -194,7 +195,7 @@ export function HomeEarthquakeDisplay() {
                 </div>
                 
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">Time</span>
                   </div>
@@ -207,7 +208,7 @@ export function HomeEarthquakeDisplay() {
                 </div>
 
                 <div>
-                  <div className="font-medium mb-1">Details</div>
+                  <div className="font-medium mb-2">Details</div>
                   <div className="text-sm text-muted-foreground space-y-1">
                     <p>
                       Depth: {mostRecentEarthquake.coordinates.depth.toFixed(1)} km
@@ -220,12 +221,13 @@ export function HomeEarthquakeDisplay() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              {/* Right Div - Map */}
+              <div className="flex-1 space-y-2">
                 <div className="font-medium">Location on Map</div>
                 <EarthquakeMap
                   latitude={mostRecentEarthquake.coordinates.latitude}
                   longitude={mostRecentEarthquake.coordinates.longitude}
-                  height="300px"
+                  height="400px"
                 />
               </div>
             </div>
