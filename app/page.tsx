@@ -1,75 +1,53 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Wind, Droplets } from "lucide-react";
+// Import a CSS module that applies a left-to-right fade overlay on the background image
+import styles from './page.module.css';
+import Image from 'next/image';
 
 export default function Home() {
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="text-center space-y-4 mb-12">
-        <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-          Disaster Monitoring System
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Real-time disaster monitoring and alert system for the Philippines
-        </p>
+    <main className="relative min-h-screen bg-black overflow-hidden">
+      {/* Content Container */}
+      <div className="relative z-10 flex flex-col justify-center h-screen px-6 md:px-10 lg:px-16 max-w-7xl mx-auto">
+        <div className="w-full md:w-1/2 animate-fade-in-up">
+          <h1 className="text-white font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 hover:scale-105 transition-transform duration-300">
+            Philcast
+          </h1>
+          <p className="text-white/90 text-lg sm:text-xl md:text-2xl leading-relaxed max-w-2xl mb-8">
+            Your trusted source for real-time disaster monitoring and alerts in the Philippines.
+          </p>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
-        {/* Earthquake Card */}
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <Link href="/earthquakes" className="block">
-            <CardHeader className="text-center">
-              <AlertTriangle className="h-16 w-16 text-orange-600 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Earthquake</CardTitle>
-              <CardDescription>
-                Real-time earthquake monitoring and alerts
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" size="lg">
-                View Earthquakes
-              </Button>
-            </CardContent>
-          </Link>
-        </Card>
+      {/* Background Image */}
+      <div className="absolute top-0 right-0 w-full md:w-2/3 h-full animate-fade-in">
+        <div className="relative h-full w-full">
+          <Image
+            src="/bg.jpg"
+            alt="Background"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent" />
+        </div>
+      </div>
 
-        {/* Typhoon Card */}
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <Link href="/typhoon" className="block">
-            <CardHeader className="text-center">
-              <Wind className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Typhoon</CardTitle>
-              <CardDescription>
-                Typhoon tracking and monitoring (Coming Soon)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" size="lg">
-                View Typhoons
-              </Button>
-            </CardContent>
-          </Link>
-        </Card>
-
-        {/* Flood Card */}
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <Link href="/flood" className="block">
-            <CardHeader className="text-center">
-              <Droplets className="h-16 w-16 text-cyan-600 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Flood</CardTitle>
-              <CardDescription>
-                Flood monitoring and alerts (Coming Soon)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" size="lg" variant="outline" disabled>
-                Coming Soon
-              </Button>
-            </CardContent>
-          </Link>
+      {/* Floating Elements */}
+      <div className="absolute bottom-8 right-8 z-20 animate-bounce">
+        <Card className="bg-white/10 backdrop-blur-lg border-none">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-white text-sm">Live Updates</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-white/80 text-sm">Monitoring Active</span>
+            </div>
+          </CardContent>
         </Card>
       </div>
-    </div>
+    </main>
   );
 }
