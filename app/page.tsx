@@ -16,7 +16,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-12">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-12 justify-center-safe">
           <Card>
             <CardHeader>
               <Activity className="h-8 w-8 text-blue-600 mb-2" />

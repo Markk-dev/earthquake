@@ -81,7 +81,6 @@ export function EarthquakeList({ earthquakes }: EarthquakeListProps) {
               <TableHead>Location</TableHead>
               <TableHead>Depth</TableHead>
               <TableHead>Time</TableHead>
-              <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -114,17 +113,6 @@ export function EarthquakeList({ earthquakes }: EarthquakeListProps) {
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <span>{formatTime(earthquake.time)}</span>
                   </div>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      earthquake.status === "reviewed"
-                        ? "default"
-                        : "secondary"
-                    }
-                  >
-                    {earthquake.status}
-                  </Badge>
                 </TableCell>
               </TableRow>
             ))}

@@ -12,7 +12,6 @@ export interface Earthquake {
   updated: number;
   url: string;
   detail: string;
-  status: string;
   tsunami: number;
   sig: number;
   net: string;
@@ -270,7 +269,6 @@ function transformPHIVOLCSData(
       updated: time, // PHIVOLCS doesn't provide separate updated time
       url: eq.detailLink || BASE_URL,
       detail: eq.detailLink || BASE_URL,
-      status: "reviewed", // PHIVOLCS data is pre-reviewed
       tsunami: 0, // PHIVOLCS doesn't provide tsunami info in table
       sig: Math.round(magnitude * 100), // Significance based on magnitude
       net: "phivolcs",

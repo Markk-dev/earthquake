@@ -1,6 +1,7 @@
 import { Earthquake } from "@/app/actions/earthquake";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, AlertTriangle, TrendingUp, MapPin } from "lucide-react";
+import { DottedSeparator } from "./ui/dottedSeparator";
 
 interface EarthquakeStatsProps {
   earthquakes: Earthquake[];
@@ -22,6 +23,7 @@ export function EarthquakeStats({ earthquakes }: EarthquakeStatsProps) {
       description: "Last 24 hours",
       icon: Activity,
       color: "text-blue-600",
+      ClassValue: "text-blue-600",
     },
     {
       title: "Significant (≥5.0)",
@@ -29,6 +31,7 @@ export function EarthquakeStats({ earthquakes }: EarthquakeStatsProps) {
       description: "Magnitude 5.0+",
       icon: AlertTriangle,
       color: "text-orange-600",
+      ClassValue: "text-orange-600",
     },
     {
       title: "Major (≥7.0)",
@@ -36,6 +39,7 @@ export function EarthquakeStats({ earthquakes }: EarthquakeStatsProps) {
       description: "Magnitude 7.0+",
       icon: TrendingUp,
       color: "text-red-600",
+      ClassValue: "text-red-600",
     },
     {
       title: "Avg Magnitude",
@@ -43,6 +47,7 @@ export function EarthquakeStats({ earthquakes }: EarthquakeStatsProps) {
       description: "Average of all events",
       icon: MapPin,
       color: "text-purple-600",
+      ClassValue: "text-purple-600 text-2xl",
     },
   ];
 
@@ -58,8 +63,10 @@ export function EarthquakeStats({ earthquakes }: EarthquakeStatsProps) {
               </CardTitle>
               <Icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
+           
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className={`text-2xl font-bold ${stat.ClassValue || ""}`}>{stat.value}</div>
+              <DottedSeparator className="my-2" />
               <p className="text-xs text-muted-foreground">
                 {stat.description}
               </p>
