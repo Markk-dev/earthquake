@@ -28,7 +28,7 @@ export default function TyphoonPage() {
       {/* Storm alerts based on user location */}
       <StormAlert className="mb-6" />
       
-      <WindyMap className={""} />
+      <WindyMap/>
     <DailyForecast />
     </div>
   );
